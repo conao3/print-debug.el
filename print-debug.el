@@ -25,6 +25,12 @@
 
 ;; Assisted printf debugging.
 
+;; To use this pacakge, simply add below code in your init.el
+
+;;   (leaf print-debug
+;;     :ensure t
+;;     :bind (("s-j" . print-debug-insert)))
+
 ;; This package is inspired by [[https://github.com/sentriz/vim-print-debug][sentriz/vim-print-debug]].
 
 
@@ -106,8 +112,12 @@ The following %-sequences are supported:
 
 ;;;###autoload
 (defun print-debug-insert (&optional arg)
-  "Insert print debug template.
-ARG is prefix argument."
+  "Insert debug statement at current line.
+ARG is prefix argument.
+
+[Default]: Insert debug statement at current line.
+\\[universal-argument]: Reset header character into `a' and insert debug statement.
+\\[universal-argument] \\[universal-argument]: Wrap current line with debug statements."
   (interactive "p")
   (let (wrap)
     (cl-case arg
