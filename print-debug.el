@@ -30,11 +30,98 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+(require 'format-spec)
+
 (defgroup print-debug nil
   "Assisted printf debugging."
   :prefix "print-debug-"
   :group 'tools
   :link '(url-link :tag "Github" "https://github.com/conao3/print-debug.el"))
+
+(defcustom print-debug-header-length 10
+  "Header length."
+  :group 'print-debug
+  :type 'integer)
+
+(defcustom print-debug-ext-template
+  '((el . "(message \"+++ %S\")")
+    (go . "fmt.Printf(\"+++ %S\\n\")")
+    (py . "print(f\"+++ %S\")")
+    (js . "console.log(`+++ %S`);")
+    (c . "printf(\"+++ %S\\n\");"))
+  "Print debug template alist based on file extension.
+
+The following %-sequences are supported:
+`%S' The header that changes every time
+     (Length is `print-debug-header-length'.).
+
+`%s' The char that changes every time."
+  :group 'print-debug
+  :type 'sexp)
+
+(defcustom print-debug-major-mode-template
+  '((c++-mode . c))
+  "Print debug template alist based on `major-mode'."
+  :group 'print-debug
+  :type 'sexp)
+
+
+;; functions
+
+(defvar print-debug-count -1)
+(defvar print-debug-chars
+  "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&*+,-.~/:;<=>?@^_`|")
+
+(defun print-debug-incf-count()
+  "Incf `print-debug-count'."
+  (cl-incf print-debug-count)
+  (setq print-debug-count (mod print-debug-count (length print-debug-chars))))
+
+(defun print-debug-get-template ()
+  "Get appropriate template."
+  (or
+   (when-let (ext (file-name-extension (buffer-file-name)))
+     (alist-get (intern ext) print-debug-ext-template))
+
+   (when-let (obj (alist-get major-mode print-debug-major-mode-template))
+     (if (symbolp obj)
+         (alist-get obj print-debug-ext-template)
+       obj))
+
+   (error "Cannot find appropriate template!")))
+
+(defun print-debug-insert-1 ()
+  "Internal function of `print-debug-insert'."
+  (save-excursion
+    (beginning-of-line)
+    (let ((indent (skip-chars-forward " " (line-end-position))))
+      (insert (format-spec
+               (print-debug-get-template)
+               (let ((char (elt print-debug-chars print-debug-count)))
+                 `((?S . ,(make-string print-debug-header-length char))
+                   (?s . ,char)))))
+      (newline)
+      (insert (make-string indent ?\s)))))
+
+;;;###autoload
+(defun print-debug-insert (&optional arg)
+  "Insert print debug template.
+ARG is prefix argument."
+  (interactive "p")
+  (let (wrap)
+    (cl-case arg
+      (1 (print-debug-incf-count))
+      (4 (setq print-debug-count 0))
+      (16 (setq wrap t)))
+
+  (if (not wrap)
+      (print-debug-insert-1)
+    (print-debug-insert-1)
+    (print-debug-incf-count)
+    (save-excursion
+      (forward-line)
+      (print-debug-insert-1)))))
 
 (provide 'print-debug)
 
