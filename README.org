@@ -28,7 +28,9 @@ Assisted printf debugging.  This package is inspired by [[https://github.com/sen
 
 * Install
 #+begin_src emacs-lisp
-  (leaf print-debug :ensure t)
+  (leaf print-debug
+    :ensure t
+    :bind (("s-j" . print-debug-insert)))
 #+end_src
 
 * Usage
