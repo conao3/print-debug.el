@@ -67,7 +67,8 @@ The following %-sequences are supported:
   :type 'sexp)
 
 (defcustom print-debug-major-mode-template
-  '((c++-mode . c))
+  '((c++-mode . c)
+    (lisp-interaction-mode . el))
   "Print debug template alist based on `major-mode'."
   :group 'print-debug
   :type 'sexp)
@@ -87,7 +88,8 @@ The following %-sequences are supported:
 (defun print-debug-get-template ()
   "Get appropriate template."
   (or
-   (when-let (ext (file-name-extension (buffer-file-name)))
+   (when-let (ext (and (buffer-file-name)
+                       (file-name-extension (buffer-file-name))))
      (alist-get (intern ext) print-debug-ext-template))
 
    (when-let (obj (alist-get major-mode print-debug-major-mode-template))
