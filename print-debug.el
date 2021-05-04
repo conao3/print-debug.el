@@ -114,7 +114,7 @@ The following %-sequences are supported:
                  (print-debug-get-template)
                  (let ((char (elt print-debug-chars print-debug-count)))
                    `((?S . ,(make-string print-debug-header-length char))
-                     (?s . ,char)))))
+                     (?s . ,(string char))))))
         (newline)
         (insert (make-string indent ?\s))))
 
