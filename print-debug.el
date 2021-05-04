@@ -101,16 +101,26 @@ The following %-sequences are supported:
 
 (defun print-debug-insert-1 ()
   "Internal function of `print-debug-insert'."
-  (save-excursion
-    (beginning-of-line)
-    (let ((indent (skip-chars-forward " " (line-end-position))))
-      (insert (format-spec
-               (print-debug-get-template)
-               (let ((char (elt print-debug-chars print-debug-count)))
-                 `((?S . ,(make-string print-debug-header-length char))
-                   (?s . ,char)))))
-      (newline)
-      (insert (make-string indent ?\s)))))
+  (let ((save-excursion-bug
+         (save-excursion
+           (let ((p (point)))
+             (beginning-of-line)
+             (skip-chars-forward " " (line-end-position))
+             (equal p (point))))))
+    (save-excursion
+      (beginning-of-line)
+      (let ((indent (skip-chars-forward " " (line-end-position))))
+        (insert (format-spec
+                 (print-debug-get-template)
+                 (let ((char (elt print-debug-chars print-debug-count)))
+                   `((?S . ,(make-string print-debug-header-length char))
+                     (?s . ,char)))))
+        (newline)
+        (insert (make-string indent ?\s))))
+
+    (when save-excursion-bug
+      (forward-line)
+      (skip-chars-forward " " (line-end-position)))))
 
 ;;;###autoload
 (defun print-debug-insert (&optional arg)
