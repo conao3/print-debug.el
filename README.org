@@ -1,96 +1,147 @@
+#+title: print-debug.el
 #+author: conao3
-#+date: <2020-03-20 Fri>
 
 [[https://github.com/conao3/print-debug.el][https://raw.githubusercontent.com/conao3/files/master/blob/headers/png/print-debug.el.png]]
+
 [[https://github.com/conao3/print-debug.el/blob/master/LICENSE][https://img.shields.io/github/license/conao3/print-debug.el.svg?style=flat-square]]
 [[https://github.com/conao3/print-debug.el/releases][https://img.shields.io/github/tag/conao3/print-debug.el.svg?style=flat-square]]
 [[https://github.com/conao3/print-debug.el/actions][https://github.com/conao3/print-debug.el/workflows/Main%20workflow/badge.svg]]
-[[https://app.codacy.com/project/conao3/print-debug.el/dashboard][https://img.shields.io/codacy/grade/62a36f4f04524d5e8c758440e8071c45.svg?logo=codacy&style=flat-square]]
-[[https://www.patreon.com/conao3][https://img.shields.io/badge/patreon-become%20a%20patron-orange.svg?logo=patreon&style=flat-square]]
-[[https://twitter.com/conao_3][https://img.shields.io/badge/twitter-@conao__3-blue.svg?logo=twitter&style=flat-square]]
-[[https://conao3-support.slack.com/join/shared_invite/enQtNjUzMDMxODcyMjE1LWUwMjhiNTU3Yjk3ODIwNzAxMTgwOTkxNmJiN2M4OTZkMWY0NjI4ZTg4MTVlNzcwNDY2ZjVjYmRiZmJjZDU4MDE][https://img.shields.io/badge/chat-on_slack-blue.svg?logo=slack&style=flat-square]]
 
-* Table of Contents
-- [[#description][Description]]
-- [[#install][Install]]
-- [[#usage][Usage]]
-- [[#customize][Customize]]
-- [[#information][Information]]
-  - [[#community][Community]]
-  - [[#contribution][Contribution]]
-  - [[#migration][Migration]]
-  - [[#license][License]]
-  - [[#author][Author]]
-  - [[#contributors][Contributors]]
+Assisted printf debugging for Emacs. Insert debug print statements instantly with unique, trackable headers across multiple programming languages.
 
-* Description
-Assisted printf debugging.  This package is inspired by [[https://github.com/sentriz/vim-print-debug][sentriz/vim-print-debug]].
+Inspired by [[https://github.com/sentriz/vim-print-debug][vim-print-debug]].
 
-* Install
+* Overview
+
+When debugging, sometimes a quick print statement is all you need. print-debug.el makes this effortless by:
+
+- Inserting language-appropriate print statements with a single keybinding
+- Generating unique character sequences so you can identify each statement in the output
+- Supporting multiple languages out of the box: Emacs Lisp, Go, Python, JavaScript, and C
+
+* Installation
+
+Requires Emacs 26.1 or later.
+
+** Using leaf
+
 #+begin_src emacs-lisp
-  (leaf print-debug
-    :ensure t
-    :bind (("s-j" . print-debug-insert)))
+(leaf print-debug
+  :ensure t
+  :bind (("s-j" . print-debug-insert)))
+#+end_src
+
+** Using use-package
+
+#+begin_src emacs-lisp
+(use-package print-debug
+  :ensure t
+  :bind (("s-j" . print-debug-insert)))
+#+end_src
+
+** Manual Installation
+
+Clone this repository and add it to your load-path:
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "/path/to/print-debug.el")
+(require 'print-debug)
+(global-set-key (kbd "s-j") #'print-debug-insert)
 #+end_src
 
 * Usage
 
-* Customize
+| Keybinding    | Description                                          |
+|---------------+------------------------------------------------------|
+| =s-j=         | Insert a debug statement at the current line         |
+| =C-u s-j=     | Reset the header character to 'a' and insert         |
+| =C-u C-u s-j= | Wrap the current line with two debug statements      |
 
-* Information
-** Community
-All feedback and suggestions are welcome!
+Each inserted statement contains a unique header that increments with each use, making it easy to trace the order of execution in your output.
 
-You can use github issues, but you can also use [[https://conao3-support.slack.com/join/shared_invite/enQtNjUzMDMxODcyMjE1LWUwMjhiNTU3Yjk3ODIwNzAxMTgwOTkxNmJiN2M4OTZkMWY0NjI4ZTg4MTVlNzcwNDY2ZjVjYmRiZmJjZDU4MDE][Slack]]
-if you want a more casual conversation.
+** Example Output
 
-** Contribution
-We welcome PR!
+In an Emacs Lisp buffer, successive calls to =print-debug-insert= produce:
 
-*** Require tools for testing
-- cask
-  - install via brew
-    #+begin_src shell
-      brew install cask
-    #+end_src
-
-  - manual install
-    #+begin_src shell
-      cd ~/
-      hub clone cask/cask
-      export PATH="$HOME/.cask/bin:$PATH"
-    #+end_src
-
-*** Running test
-Below operation flow is recommended.
-#+begin_src shell
-  make                              # Install git-hooks in local .git
-
-  git branch [feature-branch]       # Create branch named [feature-branch]
-  git checkout [feature-branch]     # Checkout branch named [feature-branch]
-
-  # <edit loop>
-  emacs print-debug.el           # Edit something you want
-
-  make test                         # Test print-debug via multi version Emacs
-  git commit -am "brabra"           # Commit (auto-run test before commit)
-  # </edit loop>
-
-  hub fork                          # Create fork at GitHub
-  git push [user] [feature-branch]  # Push feature-branch to your fork
-  hub pull-request                  # Create pull-request
+#+begin_src emacs-lisp
+(message "+++ aaaaaaaaaa")
+(message "+++ bbbbbbbbbb")
+(message "+++ cccccccccc")
 #+end_src
 
-** Migration
+In a Python file:
 
-** License
-#+begin_example
-  General Public License Version 3 (GPLv3)
-  Copyright (c) Naoya Yamashita - https://conao3.com
-  https://github.com/conao3/print-debug.el/blob/master/LICENSE
-#+end_example
+#+begin_src python
+print(f"+++ aaaaaaaaaa")
+print(f"+++ bbbbbbbbbb")
+#+end_src
 
-** Author
-- Naoya Yamashita ([[https://github.com/conao3][conao3]])
+* Configuration
 
-** Contributors
+** Customizing Templates
+
+You can customize the print statement format for each file extension:
+
+#+begin_src emacs-lisp
+(setq print-debug-ext-template
+      '((el . "(message \"+++ %S\")")
+        (go . "fmt.Printf(\"+++ %S\\n\")")
+        (py . "print(f\"+++ %S\")")
+        (js . "console.log(`+++ %S`);")
+        (c  . "printf(\"+++ %S\\n\");")))
+#+end_src
+
+Format specifiers:
+- =%S= - Full header string (length controlled by =print-debug-header-length=)
+- =%s= - Single character
+
+** Header Length
+
+Adjust the length of the debug header:
+
+#+begin_src emacs-lisp
+(setq print-debug-header-length 10)  ; default
+#+end_src
+
+** Major Mode Mapping
+
+Map major modes to use specific templates:
+
+#+begin_src emacs-lisp
+(setq print-debug-major-mode-template
+      '((c++-mode . c)
+        (lisp-interaction-mode . el)))
+#+end_src
+
+* Contributing
+
+Contributions are welcome. Please feel free to submit issues and pull requests.
+
+** Running Tests
+
+1. Install [[https://github.com/cask/cask][Cask]]:
+
+   #+begin_src shell
+   brew install cask
+   #+end_src
+
+   Or install manually:
+
+   #+begin_src shell
+   git clone https://github.com/cask/cask ~/.cask
+   export PATH="$HOME/.cask/bin:$PATH"
+   #+end_src
+
+2. Run the test suite:
+
+   #+begin_src shell
+   make test
+   #+end_src
+
+* License
+
+GPLv3. See [[https://github.com/conao3/print-debug.el/blob/master/LICENSE][LICENSE]] for details.
+
+* Author
+
+Naoya Yamashita ([[https://github.com/conao3][conao3]])
