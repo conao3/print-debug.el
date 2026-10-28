@@ -21,7 +21,7 @@ When debugging, sometimes a quick print statement is all you need. print-debug.e
 
 * Installation
 
-Requires Emacs 29.1 or later.
+Requires Emacs 26.1 or later.
 
 ** Using leaf
 
